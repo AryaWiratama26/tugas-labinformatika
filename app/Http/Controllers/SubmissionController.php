@@ -33,9 +33,9 @@ class SubmissionController extends Controller
 
         $file = $request->file('assignment_file');
         
-        $subject = Subject::find($request->subject_id);
-        $module = \App\Models\Module::find($request->module_id);
-        $labClass = \App\Models\LabClass::find($request->lab_class_id);
+        $subject = Subject::findOrFail($request->subject_id);
+        $module  = \App\Models\Module::findOrFail($request->module_id);
+        $labClass = \App\Models\LabClass::findOrFail($request->lab_class_id);
 
         
         if ($module->is_expired) {
@@ -47,28 +47,28 @@ class SubmissionController extends Controller
         $fileName = $request->student_nim . '_' . str_replace(' ', '', $module->name) . '_' . str_replace(' ', '', $subject->code ?? $subject->name) . '_' . time() . '.' . $file->getClientOriginalExtension();
 
         try {
-            
             $folderPath = trim($subject->name) . '/' . trim($module->name) . '/' . trim($labClass->name);
             $path = Storage::disk('google')->putFileAs($folderPath, $file, $fileName);
 
-            $googleDriveId = null;
+            // Ambil URL langsung dari adapter (webViewLink Google Drive)
+            $googleDriveUrl = null;
             try {
-                $metadata = Storage::disk('google')->getMetadata($path);
-                $googleDriveId = $metadata['path'] ?? null;
+                $googleDriveUrl = Storage::disk('google')->url($path);
             } catch (\Exception $e) {
-                $googleDriveId = $path;
+                // Fallback: simpan path saja
+                $googleDriveUrl = $path;
             }
-            
+
             Submission::create([
-                'subject_id' => $request->subject_id,
-                'module_id' => $request->module_id,
-                'lab_class_id' => $request->lab_class_id,
-                'student_name' => $request->student_name,
-                'student_nim' => $request->student_nim,
-                'file_name' => $fileName,
-                'file_path' => $path,
-                'google_drive_id' => $googleDriveId,
-                'file_size' => $file->getSize(),
+                'subject_id'     => $request->subject_id,
+                'module_id'      => $request->module_id,
+                'lab_class_id'   => $request->lab_class_id,
+                'student_name'   => $request->student_name,
+                'student_nim'    => $request->student_nim,
+                'file_name'      => $fileName,
+                'file_path'      => $path,
+                'google_drive_id'=> $googleDriveUrl,
+                'file_size'      => $file->getSize(),
             ]);
 
             return redirect()->route('submissions.create')->with('success', 'Tugas berhasil dikirim!');

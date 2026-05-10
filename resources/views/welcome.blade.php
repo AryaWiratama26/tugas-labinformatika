@@ -76,7 +76,7 @@
                 </div>
                 @endif
 
-                <form action="{{ route('submissions.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6 relative z-10">
+                <form id="submission-form" action="{{ route('submissions.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6 relative z-10">
                     @csrf
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -180,15 +180,52 @@
                     <!-- File Upload -->
                     <div class="space-y-2 pt-2">
                         <label class="block text-sm font-semibold text-black/80 ml-1">File Tugas</label>
-                        <div class="relative group cursor-pointer">
-                            <input type="file" name="assignment_file" id="file-upload" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" onchange="updateFileName(this)">
-                            <div class="w-full p-8 border-2 border-dashed border-black/15 rounded-3xl bg-white/30 group-hover:bg-white/60 group-hover:border-[#4A5D4E]/50 transition-all text-center flex flex-col items-center justify-center space-y-3">
+                        <div class="relative group cursor-pointer" id="upload-zone">
+                            <input type="file" name="assignment_file" id="file-upload" required
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                   onchange="updateFileName(this)">
+
+                            {{-- State: Belum ada file --}}
+                            <div id="upload-empty"
+                                 class="w-full p-8 border-2 border-dashed border-black/15 rounded-3xl bg-white/30
+                                        group-hover:bg-white/60 group-hover:border-[#4A5D4E]/50
+                                        transition-all text-center flex flex-col items-center justify-center space-y-3">
                                 <div class="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center text-[#4A5D4E] group-hover:scale-110 transition-transform">
                                     <i class="ph ph-upload-simple text-xl"></i>
                                 </div>
                                 <div>
-                                    <p class="font-medium text-black/80" id="file-name-display">Klik untuk memilih file</p>
+                                    <p class="font-medium text-black/80">Klik untuk memilih file</p>
                                     <p class="text-xs text-black/40 mt-1">Maks. 20MB (PDF, ZIP, DOCX)</p>
+                                </div>
+                            </div>
+
+                            {{-- State: File sudah dipilih --}}
+                            <div id="upload-ready" class="hidden w-full p-6 border-2 border-[#4A5D4E]/40 rounded-3xl bg-[#4A5D4E]/5 transition-all">
+                                <div class="flex items-center space-x-4">
+                                    {{-- Animated checkmark --}}
+                                    <div class="flex-shrink-0 w-14 h-14 rounded-full bg-[#4A5D4E] flex items-center justify-center shadow-md" id="check-circle">
+                                        <svg id="check-svg" class="w-7 h-7 text-white" viewBox="0 0 28 28" fill="none">
+                                            <path id="check-path" d="M6 14 L11 20 L22 9"
+                                                  stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                                                  stroke-dasharray="30" stroke-dashoffset="30"
+                                                  style="transition: stroke-dashoffset 0.5s ease 0.1s"/>
+                                        </svg>
+                                    </div>
+                                    {{-- File info --}}
+                                    <div class="flex-1 min-w-0">
+                                        <p class="font-semibold text-[#4A5D4E] text-sm truncate" id="ready-filename">—</p>
+                                        <p class="text-xs text-black/50 mt-0.5" id="ready-filesize">—</p>
+                                        <div class="flex items-center space-x-1 mt-1.5">
+                                            <span class="inline-block w-2 h-2 rounded-full bg-[#4A5D4E] animate-pulse"></span>
+                                            <span class="text-xs text-[#4A5D4E] font-medium">Siap dikirim</span>
+                                        </div>
+                                    </div>
+                                    {{-- Ganti file --}}
+                                    <div class="flex-shrink-0 relative z-20 pointer-events-none">
+                                        <span class="text-xs text-black/40 underline underline-offset-2 pointer-events-auto cursor-pointer" onclick="document.getElementById('file-upload').click()">
+                                            Ganti
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -197,9 +234,9 @@
 
                     <!-- Submit Button -->
                     <div class="pt-4">
-                        <button type="submit" class="w-full py-4 rounded-2xl font-semibold btn-primary flex items-center justify-center space-x-2 text-base">
-                            <span>Kirim Tugas Sekarang</span>
-                            <i class="ph ph-paper-plane-tilt text-lg"></i>
+                        <button type="submit" id="submit-btn" class="w-full py-4 rounded-2xl font-semibold btn-primary flex items-center justify-center space-x-2 text-base transition-all">
+                            <span id="btn-text">Kirim Tugas Sekarang</span>
+                            <i class="ph ph-paper-plane-tilt text-lg" id="btn-icon"></i>
                         </button>
                     </div>
 
@@ -208,16 +245,109 @@
         </div>
     </div>
 
+    {{-- Upload Loading Overlay --}}
+    <div id="upload-overlay" class="fixed inset-0 z-50 hidden items-center justify-center" style="background: rgba(20,20,20,0.7); backdrop-filter: blur(6px);">
+        <div class="bg-white rounded-3xl p-10 mx-4 max-w-sm w-full shadow-2xl text-center">
+            <div class="relative w-24 h-24 mx-auto mb-6">
+                <svg class="w-24 h-24" id="spinner-svg" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg" style="animation: spin 1.2s linear infinite;">
+                    <circle cx="48" cy="48" r="42" stroke="#e8ede9" stroke-width="6"/>
+                    <path d="M48 6 A42 42 0 0 1 90 48" stroke="#4A5D4E" stroke-width="6" stroke-linecap="round"/>
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <i class="ph ph-cloud-arrow-up text-4xl text-[#4A5D4E]" id="upload-icon"></i>
+                </div>
+            </div>
+            <h3 class="font-display text-xl font-bold text-black/80 mb-2" id="overlay-title">Mengunggah Tugas...</h3>
+            <p class="text-sm text-black/50 mb-6" id="overlay-subtitle">Sedang mengirim file ke Google Drive, mohon tunggu dan jangan tutup halaman ini.</p>
+            <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                <div id="progress-bar" class="h-2 bg-[#4A5D4E] rounded-full transition-all duration-700 ease-out" style="width: 5%"></div>
+            </div>
+            <p class="text-xs text-black/30 mt-2" id="progress-text">Memproses...</p>
+        </div>
+    </div>
+
+    <style>
+        @@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+
     <script>
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
         function updateFileName(input) {
-            const display = document.getElementById('file-name-display');
+            const emptyZone = document.getElementById('upload-empty');
+            const readyZone = document.getElementById('upload-ready');
+
             if (input.files && input.files.length > 0) {
-                display.textContent = input.files[0].name;
-                display.classList.add('text-[#4A5D4E]');
+                const file = input.files[0];
+
+                // Isi info file
+                document.getElementById('ready-filename').textContent = file.name;
+                document.getElementById('ready-filesize').textContent = formatBytes(file.size);
+
+                // Toggle tampilan
+                emptyZone.classList.add('hidden');
+                readyZone.classList.remove('hidden');
+
+                // Trigger animasi checkmark
+                setTimeout(() => {
+                    const path = document.getElementById('check-path');
+                    if (path) path.style.strokeDashoffset = '0';
+                }, 50);
             } else {
-                display.textContent = 'Klik untuk memilih file';
-                display.classList.remove('text-[#4A5D4E]');
+                // Reset ke state kosong
+                emptyZone.classList.remove('hidden');
+                readyZone.classList.add('hidden');
+                const path = document.getElementById('check-path');
+                if (path) path.style.strokeDashoffset = '30';
             }
+        }
+
+        // ── Upload Loading Overlay ───────────────────────────────────────
+        const submissionForm = document.getElementById('submission-form');
+        const overlay        = document.getElementById('upload-overlay');
+        const progressBar    = document.getElementById('progress-bar');
+        const progressText   = document.getElementById('progress-text');
+        const overlayTitle   = document.getElementById('overlay-title');
+        const overlaySubtitle = document.getElementById('overlay-subtitle');
+        const uploadIcon     = document.getElementById('upload-icon');
+
+        if (submissionForm) {
+            submissionForm.addEventListener('submit', function(e) {
+                // Cek semua field required sebelum tampil overlay
+                const moduleVal   = document.getElementById('module-select').value;
+                const fileInput   = document.querySelector('input[name="assignment_file"]');
+                const studentName = document.querySelector('input[name="student_name"]').value.trim();
+                const studentNim  = document.querySelector('input[name="student_nim"]').value.trim();
+                const classVal    = document.querySelector('select[name="lab_class_id"]').value;
+
+                if (!moduleVal || !fileInput.files.length || !studentName || !studentNim || !classVal) {
+                    return; // biarkan HTML5/Laravel validation jalan
+                }
+
+                // Tampilkan overlay
+                overlay.classList.remove('hidden');
+                overlay.classList.add('flex');
+                document.body.style.overflow = 'hidden';
+
+                const stages = [
+                    { pct: 20,  delay: 600,  text: 'Memvalidasi data...' },
+                    { pct: 45,  delay: 1800, text: 'Mengunggah ke Google Drive...' },
+                    { pct: 70,  delay: 4000, text: 'Menyimpan ke database...' },
+                    { pct: 90,  delay: 6500, text: 'Hampir selesai...' },
+                ];
+
+                stages.forEach(stage => {
+                    setTimeout(() => {
+                        progressBar.style.width = stage.pct + '%';
+                        progressText.textContent = stage.pct + '%';
+                        overlaySubtitle.textContent = stage.text;
+                    }, stage.delay);
+                });
+            });
         }
 
         // Module AJAX Logic
@@ -227,8 +357,8 @@
         const moduleDescText = document.getElementById('module-description-text');
         let modulesData = [];
 
-        subjectSelect.addEventListener('change', async function() {
-            const subjectId = this.value;
+        // Fungsi fetch & render modul
+        async function loadModules(subjectId, preSelectModuleId = null) {
             moduleSelect.innerHTML = '<option value="" disabled selected>Memuat modul...</option>';
             moduleSelect.disabled = true;
             moduleDescContainer.classList.add('hidden');
@@ -248,9 +378,18 @@
                         } else {
                             option.textContent = module.name + (module.deadline ? ' — Deadline: ' + module.deadline : '');
                         }
+                        // Restore old value jika ada
+                        if (preSelectModuleId && module.id == preSelectModuleId) {
+                            option.selected = true;
+                        }
                         moduleSelect.appendChild(option);
                     });
                     moduleSelect.disabled = false;
+
+                    // Jika ada module yang terpilih, tampilkan deskripsinya
+                    if (preSelectModuleId) {
+                        moduleSelect.dispatchEvent(new Event('change'));
+                    }
                 } else {
                     moduleSelect.innerHTML = '<option value="" disabled selected>Belum ada modul</option>';
                 }
@@ -258,7 +397,16 @@
                 console.error('Error fetching modules:', error);
                 moduleSelect.innerHTML = '<option value="" disabled selected>Gagal memuat modul</option>';
             }
+        }
+
+        subjectSelect.addEventListener('change', function() {
+            loadModules(this.value);
         });
+
+        // Restore state jika form gagal validasi (old values)
+        @if(old('subject_id'))
+        loadModules({{ old('subject_id') }}, {{ old('module_id', 'null') }});
+        @endif
 
         moduleSelect.addEventListener('change', function() {
             const selectedModule = modulesData.find(m => m.id == this.value);

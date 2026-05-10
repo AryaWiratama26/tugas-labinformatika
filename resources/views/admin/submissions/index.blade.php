@@ -98,18 +98,20 @@
                         <td class="px-6 py-4 text-xs text-black/50">{{ $submission->created_at->format('d M Y, H:i') }}</td>
                         <td class="px-6 py-4 text-right">
                             <div class="flex items-center justify-end space-x-2">
+                                @if($submission->google_drive_id && str_starts_with($submission->google_drive_id, 'http'))
                                 @php
-                                    $driveId = $submission->google_drive_id;
-                                    if ($driveId && str_contains($driveId, '/')) {
-                                        $driveId = last(explode('/', $driveId));
+                                    $previewUrl = str_replace(['/view', '/view?usp=drivesdk', '/view?usp=sharing'], '/preview', $submission->google_drive_id);
+                                    // Fallback: jika URL format uc?id=, konversi ke /file/d/ID/preview
+                                    if (str_contains($previewUrl, 'uc?') || str_contains($previewUrl, 'export=download')) {
+                                        preg_match('/[?&]id=([^&]+)/', $previewUrl, $m);
+                                        $previewUrl = !empty($m[1]) ? 'https://drive.google.com/file/d/' . $m[1] . '/preview' : $previewUrl;
                                     }
                                 @endphp
-                                @if($driveId)
-                                <a href="https://drive.google.com/file/d/{{ $driveId }}/view" target="_blank" class="p-2 text-[#4A5D4E] hover:bg-[#4A5D4E]/10 rounded-lg transition-all" title="Buka di Drive">
-                                    <i class="ph ph-link text-lg"></i>
+                                <a href="{{ $previewUrl }}" target="_blank" class="p-2 text-[#4A5D4E] hover:bg-[#4A5D4E]/10 rounded-lg transition-all" title="Preview di Drive">
+                                    <i class="ph ph-eye text-lg"></i>
                                 </a>
                                 @endif
-                                <form action="{{ route('admin.submissions.destroy', $submission) }}" method="POST" onsubmit="return confirm('Yakin hapus tugas {{ $submission->student_name }}? File di Google Drive juga akan ikut terhapus!');">
+                                <form action="{{ route('admin.submissions.destroy', $submission) }}" method="POST" onsubmit="return confirm('Yakin hapus tugas {{ e(str_replace("'", "\'", $submission->student_name)) }}? File di Google Drive juga akan ikut terhapus!');">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="p-2 text-red-400 hover:bg-red-50 rounded-lg transition-all" title="Hapus">
                                         <i class="ph ph-trash text-lg"></i>

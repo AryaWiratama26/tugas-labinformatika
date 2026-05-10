@@ -60,17 +60,17 @@
                     <td class="px-6 py-4 text-black/70">{{ $submission->labClass->name ?? '-' }}</td>
                     <td class="px-6 py-4 text-black/70 text-xs">{{ $submission->created_at->diffForHumans() }}</td>
                     <td class="px-6 py-4 text-right">
+                        @if($submission->google_drive_id && str_starts_with($submission->google_drive_id, 'http'))
                         @php
-                            $driveId = $submission->google_drive_id;
-                            // Jika ID mengandung slash, ambil bagian terakhir saja (virtual path dari adapter)
-                            if ($driveId && str_contains($driveId, '/')) {
-                                $driveId = last(explode('/', $driveId));
+                            $previewUrl = str_replace(['/view', '/view?usp=drivesdk', '/view?usp=sharing'], '/preview', $submission->google_drive_id);
+                            if (str_contains($previewUrl, 'uc?') || str_contains($previewUrl, 'export=download')) {
+                                preg_match('/[?&]id=([^&]+)/', $previewUrl, $m);
+                                $previewUrl = !empty($m[1]) ? 'https://drive.google.com/file/d/' . $m[1] . '/preview' : $previewUrl;
                             }
                         @endphp
-                        @if($driveId)
-                        <a href="https://drive.google.com/file/d/{{ $driveId }}/view" target="_blank" class="inline-flex items-center space-x-1 px-3 py-1.5 bg-[#4A5D4E]/10 text-[#4A5D4E] rounded-lg text-xs font-semibold hover:bg-[#4A5D4E]/20 transition-all">
-                            <i class="ph ph-link"></i>
-                            <span>Buka Drive</span>
+                        <a href="{{ $previewUrl }}" target="_blank" class="inline-flex items-center space-x-1 px-3 py-1.5 bg-[#4A5D4E]/10 text-[#4A5D4E] rounded-lg text-xs font-semibold hover:bg-[#4A5D4E]/20 transition-all">
+                            <i class="ph ph-eye"></i>
+                            <span>Preview</span>
                         </a>
                         @else
                         <span class="text-xs text-black/30">–</span>

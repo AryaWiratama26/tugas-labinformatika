@@ -8,6 +8,8 @@ class Module extends Model
 {
     protected $fillable = ['subject_id', 'name', 'description', 'deadline', 'image_path'];
 
+    protected $appends = ['is_expired'];
+
     protected $casts = [
         'deadline' => 'datetime',
     ];

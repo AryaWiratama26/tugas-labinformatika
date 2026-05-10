@@ -70,19 +70,16 @@ class ModuleController extends Controller
             'deadline' => $request->deadline ?: null,
         ];
 
-        // Hapus gambar lama jika ada gambar baru
+        // Handle image: upload baru ATAU hapus — tidak keduanya
         if ($request->hasFile('image')) {
+            // Upload gambar baru → hapus lama jika ada
             if ($module->image_path) {
                 Storage::disk('public')->delete($module->image_path);
             }
             $data['image_path'] = $request->file('image')->store('module-images', 'public');
-        }
-
-        // Hapus gambar jika checkbox "hapus gambar" dicentang
-        if ($request->boolean('remove_image')) {
-            if ($module->image_path) {
-                Storage::disk('public')->delete($module->image_path);
-            }
+        } elseif ($request->boolean('remove_image') && $module->image_path) {
+            // Hapus gambar tanpa gantinya
+            Storage::disk('public')->delete($module->image_path);
             $data['image_path'] = null;
         }
 
