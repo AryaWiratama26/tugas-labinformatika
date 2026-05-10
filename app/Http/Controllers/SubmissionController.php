@@ -48,6 +48,10 @@ class SubmissionController extends Controller
 
         try {
             $folderPath = trim($subject->name) . '/' . trim($module->name) . '/' . trim($labClass->name);
+
+            // Pastikan struktur folder ada di Google Drive (penting untuk fresh deployment)
+            Storage::disk('google')->makeDirectory($folderPath);
+
             $path = Storage::disk('google')->putFileAs($folderPath, $file, $fileName);
 
             // Ambil URL langsung dari adapter (webViewLink Google Drive)
