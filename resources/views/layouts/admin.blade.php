@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;500;600;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; background-color: #F7F5F0; color: #1C1C1C; }
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #FFFFFF; color: #000000; }
         .font-display { font-family: 'Bricolage Grotesque', sans-serif; }
     </style>
 </head>
@@ -19,33 +19,37 @@
 
     <!-- Sidebar -->
     <aside id="sidebar" class="w-64 bg-white border-r border-black/5 flex flex-col fixed h-full z-30 transition-transform duration-300 -translate-x-full lg:translate-x-0">
-        <div class="h-20 flex items-center justify-between px-8 border-b border-black/5">
-            <h1 class="font-display text-xl font-bold text-[#4A5D4E]">LabAdmin.</h1>
+        <div class="h-20 flex items-center justify-between px-6 border-b border-black/5">
+            <div class="flex items-center space-x-3">
+                <img src="{{ asset('images/logo-upb.png') }}" alt="UPB" class="h-8 w-auto">
+                <div class="w-px h-6 bg-black/10"></div>
+                <img src="{{ asset('images/simbaft.png') }}" alt="SIMBA FT" class="h-7 w-auto">
+            </div>
             <button class="lg:hidden text-black/50" onclick="toggleSidebar()">
                 <i class="ph ph-x text-2xl"></i>
             </button>
         </div>
         <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-            <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.dashboard') ? 'bg-[#4A5D4E] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
+            <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.dashboard') ? 'bg-[#193CB8] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
                 <i class="ph ph-squares-four text-xl"></i>
                 <span class="font-medium">Dashboard</span>
             </a>
-            <a href="{{ route('admin.subjects.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.subjects.*') ? 'bg-[#4A5D4E] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
+            <a href="{{ route('admin.subjects.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.subjects.*') ? 'bg-[#193CB8] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
                 <i class="ph ph-book-open-text text-xl"></i>
                 <span class="font-medium">Mata Kuliah</span>
             </a>
-            <a href="{{ route('admin.modules.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.modules.*') ? 'bg-[#4A5D4E] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
+            <a href="{{ route('admin.modules.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.modules.*') ? 'bg-[#193CB8] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
                 <i class="ph ph-files text-xl"></i>
                 <span class="font-medium">Modul Praktikum</span>
             </a>
-            <a href="{{ route('admin.classes.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.classes.*') ? 'bg-[#4A5D4E] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
+            <a href="{{ route('admin.classes.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.classes.*') ? 'bg-[#193CB8] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
                 <i class="ph ph-users-three text-xl"></i>
                 <span class="font-medium">Kelas Lab</span>
             </a>
 
             <div class="my-1 border-t border-black/5"></div>
 
-            <a href="{{ route('admin.submissions.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.submissions.*') ? 'bg-[#4A5D4E] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
+            <a href="{{ route('admin.submissions.index') }}" class="flex items-center space-x-3 px-4 py-3 rounded-2xl {{ request()->routeIs('admin.submissions.*') ? 'bg-[#193CB8] text-white' : 'text-black/60 hover:bg-black/5' }} transition-all">
                 <i class="ph ph-tray text-xl"></i>
                 <span class="font-medium">Semua Tugas</span>
             </a>

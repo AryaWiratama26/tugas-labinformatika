@@ -12,6 +12,15 @@ use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\SubmissionController as AdminSubmissionController;
 use App\Models\Module;
 
+Route::post('/lang', function (\Illuminate\Http\Request $request) {
+    $locale = $request->input('locale', 'id');
+    if (!in_array($locale, ['id', 'en'])) {
+        $locale = 'id';
+    }
+    session(['locale' => $locale]);
+    return redirect()->back();
+})->name('lang.switch');
+
 Route::get('/', [SubmissionController::class, 'create'])->name('submissions.create');
 Route::post('/', [SubmissionController::class, 'store'])->name('submissions.store');
 

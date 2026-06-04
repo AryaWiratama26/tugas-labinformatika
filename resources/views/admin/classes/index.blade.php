@@ -6,7 +6,7 @@
 <div class="flex flex-col space-y-6">
     <div class="flex justify-between items-center">
         <p class="text-black/60">Atur kelas lab yang akan muncul di dropdown form pengumpulan tugas.</p>
-        <a href="{{ route('admin.classes.create') }}" class="px-4 py-2 bg-[#4A5D4E] text-white rounded-xl font-medium text-sm hover:bg-[#38473b] transition-all flex items-center space-x-2">
+        <a href="{{ route('admin.classes.create') }}" class="px-4 py-2 bg-[#193CB8] text-white rounded-xl font-medium text-sm hover:bg-[#FFDF20] transition-all flex items-center space-x-2">
             <i class="ph ph-plus"></i>
             <span>Tambah Kelas</span>
         </a>

@@ -15,14 +15,14 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="ph ph-magnifying-glass text-black/40"></i>
                     </div>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Ketik NIM atau Nama..." class="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-black/10 focus:border-[#4A5D4E] focus:outline-none focus:ring-4 focus:ring-[#4A5D4E]/10 transition-all">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Ketik NIM atau Nama..." class="w-full pl-9 pr-4 py-2.5 text-sm rounded-xl border border-black/10 focus:border-[#193CB8] focus:outline-none focus:ring-4 focus:ring-[#193CB8]/10 transition-all">
                 </div>
             </div>
 
             {{-- Filter Mata Kuliah --}}
             <div class="min-w-[180px]">
                 <label class="block text-xs font-semibold text-black/50 mb-1.5 ml-1">Mata Kuliah</label>
-                <select name="subject_id" class="w-full px-3 py-2.5 text-sm rounded-xl border border-black/10 focus:border-[#4A5D4E] focus:outline-none focus:ring-4 focus:ring-[#4A5D4E]/10 transition-all cursor-pointer">
+                <select name="subject_id" class="w-full px-3 py-2.5 text-sm rounded-xl border border-black/10 focus:border-[#193CB8] focus:outline-none focus:ring-4 focus:ring-[#193CB8]/10 transition-all cursor-pointer">
                     <option value="">Semua Matkul</option>
                     @foreach($subjects as $subject)
                         <option value="{{ $subject->id }}" {{ request('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->name }}</option>
@@ -33,7 +33,7 @@
             {{-- Filter Modul --}}
             <div class="min-w-[180px]">
                 <label class="block text-xs font-semibold text-black/50 mb-1.5 ml-1">Modul</label>
-                <select name="module_id" class="w-full px-3 py-2.5 text-sm rounded-xl border border-black/10 focus:border-[#4A5D4E] focus:outline-none focus:ring-4 focus:ring-[#4A5D4E]/10 transition-all cursor-pointer">
+                <select name="module_id" class="w-full px-3 py-2.5 text-sm rounded-xl border border-black/10 focus:border-[#193CB8] focus:outline-none focus:ring-4 focus:ring-[#193CB8]/10 transition-all cursor-pointer">
                     <option value="">Semua Modul</option>
                     @foreach($modules as $mod)
                         <option value="{{ $mod->id }}" {{ request('module_id') == $mod->id ? 'selected' : '' }}>{{ $mod->subject->name ?? '' }} — {{ $mod->name }}</option>
@@ -44,7 +44,7 @@
             {{-- Filter Kelas --}}
             <div class="min-w-[150px]">
                 <label class="block text-xs font-semibold text-black/50 mb-1.5 ml-1">Kelas</label>
-                <select name="lab_class_id" class="w-full px-3 py-2.5 text-sm rounded-xl border border-black/10 focus:border-[#4A5D4E] focus:outline-none focus:ring-4 focus:ring-[#4A5D4E]/10 transition-all cursor-pointer">
+                <select name="lab_class_id" class="w-full px-3 py-2.5 text-sm rounded-xl border border-black/10 focus:border-[#193CB8] focus:outline-none focus:ring-4 focus:ring-[#193CB8]/10 transition-all cursor-pointer">
                     <option value="">Semua Kelas</option>
                     @foreach($classes as $class)
                         <option value="{{ $class->id }}" {{ request('lab_class_id') == $class->id ? 'selected' : '' }}>{{ $class->name }}</option>
@@ -54,7 +54,7 @@
 
             {{-- Buttons --}}
             <div class="flex items-center gap-2">
-                <button type="submit" class="px-4 py-2.5 bg-[#4A5D4E] text-white text-sm font-semibold rounded-xl hover:bg-[#38473b] transition-all flex items-center space-x-1.5">
+                <button type="submit" class="px-4 py-2.5 bg-[#193CB8] text-white text-sm font-semibold rounded-xl hover:bg-[#FFDF20] transition-all flex items-center space-x-1.5">
                     <i class="ph ph-funnel"></i>
                     <span>Filter</span>
                 </button>
@@ -107,7 +107,7 @@
                                         $previewUrl = !empty($m[1]) ? 'https://drive.google.com/file/d/' . $m[1] . '/preview' : $previewUrl;
                                     }
                                 @endphp
-                                <a href="{{ $previewUrl }}" target="_blank" class="p-2 text-[#4A5D4E] hover:bg-[#4A5D4E]/10 rounded-lg transition-all" title="Preview di Drive">
+                                <a href="{{ $previewUrl }}" target="_blank" class="p-2 text-[#193CB8] hover:bg-[#193CB8]/10 rounded-lg transition-all" title="Preview di Drive">
                                     <i class="ph ph-eye text-lg"></i>
                                 </a>
                                 @endif
