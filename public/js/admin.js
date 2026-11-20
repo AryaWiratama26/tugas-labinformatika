@@ -1,6 +1,6 @@
 /**
  * Admin helpers: SweetAlert2 confirm dialogs, flash toasts, copy-to-clipboard.
- * All destructive forms use `data-confirm*` attributes — no per-page JS needed.
+ * All destructive forms use `data-confirm*` attributes, no per-page JS needed.
  * Falls back to native confirm() if the Swal CDN fails to load.
  */
 (function () {

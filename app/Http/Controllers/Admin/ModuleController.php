@@ -119,7 +119,7 @@ class ModuleController extends Controller
             'deadline' => $request->deadline ?: null,
         ];
 
-        // Handle image: upload baru ATAU hapus — tidak keduanya
+        // Handle image: upload baru ATAU hapus, tidak keduanya
         if ($request->hasFile('image')) {
             // Upload gambar baru → hapus lama jika ada
             if ($module->image_path) {

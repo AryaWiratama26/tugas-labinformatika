@@ -1,4 +1,4 @@
-# API Tugas Lab — v1
+# API Tugas Lab v1
 
 Base URL: `http://domain-anda/api/v1`
 Auth: header `X-API-KEY: <key>` (atau `Authorization: Bearer <key>`).

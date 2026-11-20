@@ -1,60 +1,90 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Pengumpulan Tugas Praktikum
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk pengumpulan tugas praktikum mahasiswa dan pengelolaannya oleh admin lab. Mahasiswa mengisi form, mengunggah berkas, dan berkas tersimpan rapi di Google Drive. Admin mengatur mata kuliah, modul, dan kelas, lalu menilai, mengarsipkan, dan mengekspor rekap pengumpulan.
 
-## About Laravel
+Dibangun dengan Laravel 12 + MySQL + Google Drive API.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fitur
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Halaman publik (mahasiswa)**
+- Form pengumpulan: nama, NIM, mata kuliah, modul (dinamis per matkul), kelas, dan berkas (maks 20 MB)
+- Berkas tersimpan di Google Drive dengan struktur folder `Mata Kuliah / Modul / Kelas`
+- Penamaan berkas otomatis dan konsisten
+- Modul yang sudah lewat tenggat otomatis ditolak, modul yang diarsipkan tidak tampil di form
+- Dwibahasa Indonesia dan Inggris
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Panel admin**
+- Dashboard dengan langkah awal, ringkasan, dan pengingat tugas yang belum dinilai
+- Kelola mata kuliah, modul (dengan tenggat dan gambar), dan kelas lab
+- Daftar pengumpulan dengan pencarian, filter (matkul, modul, kelas, status nilai, status tampil), dan pengurutan
+- Penilaian dan umpan balik per pengumpulan
+- Arsip untuk menyembunyikan data dari form mahasiswa tanpa menghapusnya
+- Aksi massal: nilai, arsipkan, tampilkan, hapus, dan ekspor CSV (semua atau yang dipilih)
+- Kelola API key untuk integrasi pihak ketiga
 
-## Learning Laravel
+**API v1**
+- Autentikasi memakai API key lewat header `X-API-KEY`
+- CRUD mata kuliah, modul, dan kelas
+- Baca data pengumpulan beserta nilai, ubah nilai, arsipkan, dan hapus
+- Dokumentasi lengkap tersedia di `API.md`
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Kebutuhan sistem
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8.2 atau lebih baru
+- Composer
+- MySQL
+- Node.js dan npm (untuk membangun aset frontend)
+- Akun Google dengan akses Drive API (Client ID, Client Secret, Refresh Token, dan ID folder tujuan)
 
-## Laravel Sponsors
+## Instalasi
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+git clone <url-repo>
+cd tugas_lab
 
-### Premium Partners
+composer install
+cp .env.example .env
+php artisan key:generate
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+npm install
+npm run build
 
-## Contributing
+php artisan migrate --force
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Buat akun admin pertama lewat tinker atau seeder yang tersedia, lalu jalankan server pengembangan:
 
-## Code of Conduct
+```bash
+php artisan serve
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Buka `http://localhost:8000` untuk form pengumpulan dan `http://localhost:8000/login` untuk panel admin.
 
-## Security Vulnerabilities
+## Konfigurasi penting di `.env`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+| Kunci | Keterangan |
+| --- | --- |
+| `DB_*` | Koneksi database MySQL |
+| `GOOGLE_DRIVE_CLIENT_ID`, `GOOGLE_DRIVE_CLIENT_SECRET`, `GOOGLE_DRIVE_REFRESH_TOKEN` | Kredensial Drive API |
+| `GOOGLE_DRIVE_FOLDER_ID` | Folder root tempat semua berkas disimpan |
+| `SESSION_DRIVER`, `CACHE_STORE`, `QUEUE_CONNECTION` | Disarankan `database` untuk instalasi standar |
 
-## License
+## Alur kerja admin baru
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# tugas-labinformatika
+1. Tambah mata kuliah di menu Mata Kuliah
+2. Tambah modul beserta tenggat di menu Modul Praktikum
+3. Tambah kelas di menu Kelas Lab
+4. Bagikan tautan form (`/`) ke praktikan
+5. Nilai pengumpulan yang masuk, arsipkan yang sudah selesai, ekspor CSV bila perlu rekap
+
+## Pengujian
+
+```bash
+php artisan test
+```
+
+Tes mencakup autentikasi API key, CRUD API, penilaian, arsip dan visibilitas, aksi massal, serta render semua halaman admin.
+
+## Lisensi
+
+Proyek ini memakai lisensi [MIT](https://opensource.org/licenses/MIT).
