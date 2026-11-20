@@ -240,8 +240,8 @@
                                         </svg>
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <p class="font-semibold text-[#193CB8] text-sm truncate" id="ready-filename">—</p>
-                                        <p class="text-xs text-black/50 mt-0.5" id="ready-filesize">—</p>
+                                        <p class="font-semibold text-[#193CB8] text-sm truncate" id="ready-filename">-</p>
+                                        <p class="text-xs text-black/50 mt-0.5" id="ready-filesize">-</p>
                                         <div class="flex items-center space-x-1 mt-1.5">
                                             <span class="inline-block w-2 h-2 rounded-full bg-[#193CB8] animate-pulse"></span>
                                             <span class="text-xs text-[#193CB8] font-medium">{{ __('submission.file_ready') }}</span>
@@ -416,7 +416,7 @@
                             option.textContent = module.name + ' ' + __lang.module_closed;
                             option.disabled = true;
                         } else {
-                            option.textContent = module.name + (module.deadline ? ' — ' + __lang.module_deadline + ' ' + module.deadline : '');
+                            option.textContent = module.name + (module.deadline ? ' · ' + __lang.module_deadline + ' ' + module.deadline : '');
                         }
                         if (preSelectModuleId && module.id == preSelectModuleId) {
                             option.selected = true;

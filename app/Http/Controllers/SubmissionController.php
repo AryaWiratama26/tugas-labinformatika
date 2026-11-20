@@ -12,8 +12,8 @@ class SubmissionController extends Controller
 {
     public function create()
     {
-        $subjects = Subject::all();
-        $classes = LabClass::all();
+        $subjects = Subject::visible()->orderBy('name')->get();
+        $classes = LabClass::visible()->orderBy('name')->get();
         return view('welcome', compact('subjects', 'classes'));
     }
 
@@ -35,6 +35,13 @@ class SubmissionController extends Controller
         $subject  = Subject::findOrFail($request->subject_id);
         $module   = \App\Models\Module::findOrFail($request->module_id);
         $labClass = \App\Models\LabClass::findOrFail($request->lab_class_id);
+
+        foreach (['subject' => $subject, 'module' => $module, 'kelas' => $labClass] as $label => $model) {
+            if ($model->is_hidden) {
+                return redirect()->back()->withInput()
+                    ->with('error', "Maaf, {$label} tersebut sudah diarsipkan dan tidak menerima pengumpulan lagi.");
+            }
+        }
 
         if ($module->is_expired) {
             return redirect()->back()->withInput()

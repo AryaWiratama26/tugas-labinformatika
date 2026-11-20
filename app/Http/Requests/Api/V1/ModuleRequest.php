@@ -1,0 +1,25 @@
+<?php
+
+namespace App\Http\Requests\Api\V1;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class ModuleRequest extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        $required = $this->isMethod('post') ? 'required' : 'sometimes';
+        return [
+            'subject_id' => $required.'|exists:subjects,id',
+            'name' => $required.'|string|max:255',
+            'description' => 'nullable|string',
+            'deadline' => 'nullable|date',
+            'is_hidden' => 'sometimes|boolean',
+        ];
+    }
+}

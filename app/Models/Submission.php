@@ -15,7 +15,28 @@ class Submission extends Model
         'file_name',
         'file_path',
         'google_drive_id',
-        'file_size'
+        'file_size',
+        'score',
+        'feedback',
+        'is_hidden',
+        'graded_at',
+        'graded_by',
+    ];
+
+    public function scopeVisible($query)
+    {
+        return $query->where('is_hidden', false);
+    }
+
+    public function scopeHidden($query)
+    {
+        return $query->where('is_hidden', true);
+    }
+
+    protected $casts = [
+        'score' => 'decimal:2',
+        'graded_at' => 'datetime',
+        'is_hidden' => 'boolean',
     ];
 
     public function subject()

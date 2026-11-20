@@ -8,10 +8,47 @@ use Illuminate\Http\Request;
 
 class LabClassController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $classes = LabClass::latest()->get();
-        return view('admin.classes.index', compact('classes'));
+        $query = LabClass::latest();
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%'.$request->search.'%');
+        }
+        match ($request->input('visibility', 'visible')) {
+            'hidden' => $query->hidden(),
+            'all' => null,
+            default => $query->visible(),
+        };
+        $classes = $query->get();
+        $hiddenCount = LabClass::hidden()->count();
+        return view('admin.classes.index', compact('classes', 'hiddenCount'));
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'action' => 'sometimes|in:delete,hide,unhide',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'exists:lab_classes,id',
+        ]);
+
+        $action = $request->input('action', 'delete');
+        $ids = $request->input('ids');
+        $count = count($ids);
+
+        match ($action) {
+            'hide' => LabClass::whereIn('id', $ids)->update(['is_hidden' => true]),
+            'unhide' => LabClass::whereIn('id', $ids)->update(['is_hidden' => false]),
+            default => LabClass::whereIn('id', $ids)->delete(),
+        };
+
+        $messages = [
+            'hide' => "{$count} kelas diarsipkan, tidak tampil di form mahasiswa.",
+            'unhide' => "{$count} kelas ditampilkan kembali.",
+            'delete' => "{$count} kelas beserta tugasnya dihapus.",
+        ];
+
+        return redirect()->route('admin.classes.index')->with('success', $messages[$action]);
     }
 
     public function create()

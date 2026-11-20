@@ -11,6 +11,50 @@
         <p class="text-black/50 mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
     </div>
 
+    {{-- Setup checklist (first-time operators) --}}
+    @php
+        $setupSteps = [
+            ['label' => 'Tambah Mata Kuliah', 'desc' => 'Daftar matkul yang dibuka untuk pengumpulan', 'done' => $totalSubjects > 0, 'url' => route('admin.subjects.index')],
+            ['label' => 'Tambah Modul + Deadline', 'desc' => 'Tugas per matkul, form menolak jika lewat tenggat', 'done' => $totalModules > 0, 'url' => route('admin.modules.index')],
+            ['label' => 'Tambah Kelas Lab', 'desc' => 'Daftar kelas yang muncul di form', 'done' => $totalClasses > 0, 'url' => route('admin.classes.index')],
+            ['label' => 'Sebarkan link form', 'desc' => 'Bagikan ke praktikan agar bisa mengumpulkan', 'done' => $totalSubmissions > 0, 'url' => url('/')],
+        ];
+        $setupDone = collect($setupSteps)->where('done', true)->count();
+    @endphp
+    @if($setupDone < count($setupSteps))
+    <div class="bg-white rounded-2xl border border-[#193CB8]/15 shadow-sm p-5">
+        <div class="flex items-center justify-between mb-1">
+            <h3 class="font-display font-semibold">Langkah Awal</h3>
+            <span class="text-xs font-semibold text-[#193CB8] bg-[#193CB8]/10 px-2.5 py-1 rounded-lg">{{ $setupDone }}/{{ count($setupSteps) }} selesai</span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 mt-3">
+            @foreach($setupSteps as $i => $step)
+            <a href="{{ $step['url'] }}" @if($i === 3) target="_blank" @endif class="flex items-start space-x-3 p-3.5 rounded-xl border transition-all {{ $step['done'] ? 'border-black/5 bg-black/[0.02]' : 'border-[#193CB8]/20 bg-[#193CB8]/[0.03] hover:border-[#193CB8]/40 hover:bg-[#193CB8]/[0.06]' }}">
+                <div class="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 {{ $step['done'] ? 'bg-green-100' : 'bg-[#193CB8] text-white' }}">
+                    @if($step['done'])
+                        <i class="ph ph-check text-sm text-green-600"></i>
+                    @else
+                        <span class="text-xs font-bold">{{ $i + 1 }}</span>
+                    @endif
+                </div>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold {{ $step['done'] ? 'text-black/40 line-through' : '' }}">{{ $step['label'] }}</p>
+                    <p class="text-xs text-black/40 mt-0.5 leading-relaxed">{{ $step['desc'] }}</p>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    @if($ungradedCount > 0)
+    <a href="{{ route('admin.submissions.index') }}" class="flex items-center space-x-3 bg-[#FFDF20]/25 border border-[#FFDF20] rounded-2xl px-5 py-4 hover:bg-[#FFDF20]/40 transition-all">
+        <i class="ph ph-star text-xl"></i>
+        <p class="text-sm font-medium">Ada <span class="font-bold">{{ number_format($ungradedCount) }} tugas</span> yang belum dinilai. Klik untuk menilai sekarang.</p>
+        <i class="ph ph-arrow-right ml-auto"></i>
+    </a>
+    @endif
+
     {{-- Stats --}}
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white rounded-2xl p-5 border border-black/5 shadow-sm flex items-center space-x-4">

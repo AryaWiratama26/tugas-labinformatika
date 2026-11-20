@@ -57,7 +57,7 @@
                 <div id="image-placeholder">
                     <i class="ph ph-image text-4xl text-black/20"></i>
                     <p class="text-sm text-black/40 mt-2">{{ $module->image_path ? 'Ganti dengan gambar baru' : 'Klik atau drag & drop gambar di sini' }}</p>
-                    <p class="text-xs text-black/30 mt-1">PNG, JPG, WEBP — Maks. 5MB</p>
+                    <p class="text-xs text-black/30 mt-1">PNG, JPG, WEBP, maks. 5MB</p>
                 </div>
                 <div id="image-preview" class="hidden">
                     <img id="preview-img" src="" alt="Preview" class="max-h-40 mx-auto rounded-xl object-contain">

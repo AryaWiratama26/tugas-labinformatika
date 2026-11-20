@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\LabClassController;
 
 use App\Http\Controllers\Admin\ModuleController;
+use App\Http\Controllers\Admin\ApiKeyController;
 use App\Http\Controllers\Admin\SubmissionController as AdminSubmissionController;
 use App\Models\Module;
 
@@ -26,7 +27,10 @@ Route::post('/', [SubmissionController::class, 'store'])->name('submissions.stor
 
 
 Route::get('/api/subjects/{subject}/modules', function (App\Models\Subject $subject) {
-    $modules = $subject->modules()->latest()->get()->map(function ($module) {
+    if ($subject->is_hidden) {
+        return response()->json([]);
+    }
+    $modules = $subject->modules()->visible()->latest()->get()->map(function ($module) {
         return [
             'id' => $module->id,
             'name' => $module->name,
@@ -47,10 +51,20 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Admin Routes
 Route::middleware('auth')->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('subjects/bulk', [SubjectController::class, 'bulkDestroy'])->name('subjects.bulk');
     Route::resource('subjects', SubjectController::class);
+    Route::post('modules/bulk', [ModuleController::class, 'bulkDestroy'])->name('modules.bulk');
     Route::resource('modules', ModuleController::class);
+    Route::post('classes/bulk', [LabClassController::class, 'bulkDestroy'])->name('classes.bulk');
     Route::resource('classes', LabClassController::class)->parameters(['classes' => 'labClass']);
     Route::get('submissions', [AdminSubmissionController::class, 'index'])->name('submissions.index');
     Route::get('submissions/export', [AdminSubmissionController::class, 'export'])->name('submissions.export');
+    Route::post('submissions/bulk', [AdminSubmissionController::class, 'bulk'])->name('submissions.bulk');
+    Route::get('submissions/{submission}/grade', [AdminSubmissionController::class, 'edit'])->name('submissions.edit');
+    Route::put('submissions/{submission}/grade', [AdminSubmissionController::class, 'update'])->name('submissions.update');
     Route::delete('submissions/{submission}', [AdminSubmissionController::class, 'destroy'])->name('submissions.destroy');
+    Route::get('api-keys', [ApiKeyController::class, 'index'])->name('api-keys.index');
+    Route::post('api-keys', [ApiKeyController::class, 'store'])->name('api-keys.store');
+    Route::post('api-keys/{apiKey}/revoke', [ApiKeyController::class, 'revoke'])->name('api-keys.revoke');
+    Route::delete('api-keys/{apiKey}', [ApiKeyController::class, 'destroy'])->name('api-keys.destroy');
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Module;
 use App\Models\Submission;
 use App\Models\Subject;
 use App\Models\LabClass;
@@ -14,9 +15,11 @@ class DashboardController extends Controller
     {
         $totalSubmissions = Submission::count();
         $totalSubjects = Subject::count();
+        $totalModules = Module::count();
         $totalClasses = LabClass::count();
+        $ungradedCount = Submission::whereNull('score')->count();
         $recentSubmissions = Submission::with(['subject', 'labClass'])->latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('totalSubmissions', 'totalSubjects', 'totalClasses', 'recentSubmissions'));
+        return view('admin.dashboard', compact('totalSubmissions', 'totalSubjects', 'totalModules', 'totalClasses', 'ungradedCount', 'recentSubmissions'));
     }
 }

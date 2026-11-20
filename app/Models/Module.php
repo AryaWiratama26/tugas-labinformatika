@@ -6,13 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Module extends Model
 {
-    protected $fillable = ['subject_id', 'name', 'description', 'deadline', 'image_path'];
+    protected $fillable = ['subject_id', 'name', 'description', 'deadline', 'image_path', 'is_hidden'];
 
     protected $appends = ['is_expired'];
 
     protected $casts = [
         'deadline' => 'datetime',
+        'is_hidden' => 'boolean',
     ];
+
+    public function scopeVisible($query)
+    {
+        return $query->where('is_hidden', false);
+    }
+
+    public function scopeHidden($query)
+    {
+        return $query->where('is_hidden', true);
+    }
 
     public function getIsExpiredAttribute(): bool
     {

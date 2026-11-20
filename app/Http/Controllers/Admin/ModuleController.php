@@ -10,10 +10,59 @@ use Illuminate\Support\Facades\Storage;
 
 class ModuleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $modules = Module::with('subject')->latest()->get();
-        return view('admin.modules.index', compact('modules'));
+        $query = Module::with('subject')->latest();
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('name', 'like', '%'.$request->search.'%')
+                    ->orWhere('description', 'like', '%'.$request->search.'%');
+            });
+        }
+        if ($request->filled('subject_id')) {
+            $query->where('subject_id', $request->input('subject_id'));
+        }
+        match ($request->input('visibility', 'visible')) {
+            'hidden' => $query->hidden(),
+            'all' => null,
+            default => $query->visible(),
+        };
+        $modules = $query->get();
+        $subjects = Subject::orderBy('name')->get();
+        $hiddenCount = Module::hidden()->count();
+        return view('admin.modules.index', compact('modules', 'subjects', 'hiddenCount'));
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $request->validate([
+            'action' => 'sometimes|in:delete,hide,unhide',
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'exists:modules,id',
+        ]);
+
+        $action = $request->input('action', 'delete');
+        $ids = $request->input('ids');
+        $count = count($ids);
+
+        if ($action === 'delete') {
+            Module::whereIn('id', $ids)->get()->each(function (Module $module) {
+                if ($module->image_path) {
+                    Storage::disk('public')->delete($module->image_path);
+                }
+                $module->delete();
+            });
+        } else {
+            Module::whereIn('id', $ids)->update(['is_hidden' => $action === 'hide']);
+        }
+
+        $messages = [
+            'hide' => "{$count} modul diarsipkan, tidak tampil di form mahasiswa.",
+            'unhide' => "{$count} modul ditampilkan kembali.",
+            'delete' => "{$count} modul beserta tugasnya dihapus.",
+        ];
+
+        return redirect()->route('admin.modules.index')->with('success', $messages[$action]);
     }
 
     public function create()
